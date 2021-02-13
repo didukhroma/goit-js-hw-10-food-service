@@ -1,32 +1,50 @@
+//-------------------LOCALE STORAGE
+const keyLocalStorage = 'theme';
+const themeLocalStorage = localStorage.getItem(keyLocalStorage);
 //-------------------THEME
 const Theme = {
   LIGHT: 'light-theme',
   DARK: 'dark-theme',
 };
 //-------------------REFS
-const bodyRef = document.querySelector('body');
-const switcherRef = document.querySelector('#theme-switch-toggle ');
-//-----------------------------------------
-const themeLocalStorage = localStorage.getItem('theme');
-if (themeLocalStorage === null) {
-  bodyRef.classList.add(Theme.LIGHT);
-  localStorage.setItem('theme', Theme.LIGHT);
-} else if (themeLocalStorage === 'dark-theme') {
-  bodyRef.classList.add(Theme.DARK);
-  switcherRef.checked = 'true';
+const refs = {
+  bodyRef: document.querySelector('body'),
+  switcherRef: document.querySelector('#theme-switch-toggle'),
+};
+//-------------------FUNCTIONS
+function addTheme({ LIGHT, DARK }, value) {
+  let addClass = LIGHT;
+  let removeClass = DARK;
+  if (value === 'darkTheme') {
+    addClass = DARK;
+    removeClass = LIGHT;
+  }
+  refs.bodyRef.classList.add(addClass);
+  refs.bodyRef.classList.remove(removeClass);
+  localStorage.removeItem(keyLocalStorage);
+  localStorage.setItem(keyLocalStorage, addClass);
+}
+//-----------------------------------------------
+function themeHandler() {
+  if (refs.bodyRef.classList.contains(Theme.LIGHT)) {
+    addTheme(Theme, 'darkTheme');
+  } else {
+    addTheme(Theme);
+  }
+}
+//-----------------------------------------------
+function saveTheme() {
+  if (themeLocalStorage === null || themeLocalStorage === Theme.LIGHT) {
+    addTheme(Theme);
+  } else if (themeLocalStorage === Theme.DARK) {
+    addTheme(Theme, 'darkTheme');
+    refs.switcherRef.checked = 'true';
+  }
+}
+//-----------------------------------------------
+function changeTheme() {
+  refs.switcherRef.addEventListener('change', e => themeHandler(e));
 }
 //-----------------------------------------
-switcherRef.addEventListener('change', e => {
-  if (bodyRef.classList.contains(Theme.LIGHT)) {
-    bodyRef.classList.add(Theme.DARK);
-    bodyRef.classList.remove(Theme.LIGHT);
-    switcherRef.checked = 'true';
-    localStorage.removeItem('theme');
-    localStorage.setItem('theme', Theme.DARK);
-  } else {
-    bodyRef.classList.add(Theme.LIGHT);
-    bodyRef.classList.remove(Theme.DARK);
-    localStorage.removeItem('theme');
-    localStorage.setItem('theme', Theme.LIGHT);
-  }
-});
+saveTheme();
+changeTheme();
